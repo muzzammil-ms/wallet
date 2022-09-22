@@ -22,7 +22,7 @@ class Wallet {
   private portalId = ``;
   private walletPermissions: WalletPermissionConfig;
 
-  private generateRandomnString(length: number) {
+  private generateRandomnString = (length: number) => {
     var result = "";
     var characters =
       "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -31,16 +31,13 @@ class Wallet {
       result += characters.charAt(Math.floor(Math.random() * charactersLength));
     }
     return result;
-  }
+  };
 
-  private generatePortalId() {
+  private generatePortalId = () => {
     return `skywallet-${this.generateRandomnString(10)}`;
-  }
+  };
 
-  private getFrame() {}
-
-  private injectPortal() {
-    console.log("Injecting portal", this.portalId);
+  private injectPortal = () => {
     const elem = document.getElementById(this.portalId);
     if (elem) return;
     // Start injecting iframe
@@ -160,7 +157,7 @@ class Wallet {
      */
     const closeContainer = document.createElement("div");
     closeContainer.setAttribute("class", `close-container`);
-    closeContainer.onclick = this.close.bind(this);
+    closeContainer.onclick = this.close;
     const closeText = document.createElement("span");
     closeText.innerHTML = "Close";
     const cross = document.createElement("button");
@@ -176,7 +173,7 @@ class Wallet {
     portal.appendChild(iframe);
     portal.appendChild(overlay);
     document.body.appendChild(portal);
-  }
+  };
 
   constructor(options?: WalletOptions) {
     this.client_id = options?.client_id || "default";
@@ -190,40 +187,45 @@ class Wallet {
       ...(options?.permission || {}),
     };
     this.portalId = this.generatePortalId();
-    this.injectPortal();
+    if (typeof window !== "undefined") {
+      let ip = this.injectPortal;
+      ip();
+    }
   }
 
-  openWallet() {
+  openWallet = () => {
     document
       .getElementById(this.portalId)
       ?.setAttribute("style", "display: block;");
-  }
+  };
 
-  openBenefit(benefitId: string) {}
+  openBenefit = (benefitId: string) => {};
 
-  openNftDetail() {}
+  openNftDetail = () => {};
 
-  openMyNfts() {}
+  openMyNfts = () => {};
 
-  openCollections() {}
+  openCollections = () => {};
 
-  close() {
+  close = () => {
     document.getElementById(this.portalId)?.setAttribute("style", "");
+  };
+
+  on = (eventName: WalletEvent, handler: (data: object) => void) => {};
+}
+
+if (typeof window !== "undefined") {
+  const initWallet = () => {
+    (window as any).Wallet = Wallet;
+  };
+
+  if (document.readyState === "complete") {
+    initWallet();
+  } else if ((window as any).attachEvent) {
+    (window as any).attachEvent(`onload`, initWallet);
+  } else {
+    window.addEventListener(`load`, initWallet, false);
   }
-
-  on(eventName: WalletEvent, handler: (data: object) => void) {}
-}
-
-function initWallet() {
-  (window as any).Wallet = Wallet;
-}
-
-if (document.readyState === "complete") {
-  initWallet();
-} else if ((window as any).attachEvent) {
-  (window as any).attachEvent(`onload`, initWallet);
-} else {
-  window.addEventListener(`load`, initWallet, false);
 }
 
 export default Wallet;

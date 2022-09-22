@@ -17,15 +17,14 @@ declare class Wallet {
     private walletPermissions;
     private generateRandomnString;
     private generatePortalId;
-    private getFrame;
     private injectPortal;
     constructor(options?: WalletOptions);
-    openWallet(): void;
-    openBenefit(benefitId: string): void;
-    openNftDetail(): void;
-    openMyNfts(): void;
-    openCollections(): void;
-    close(): void;
-    on(eventName: WalletEvent, handler: (data: object) => void): void;
+    openWallet: () => void;
+    openBenefit: (benefitId: string) => void;
+    openNftDetail: () => void;
+    openMyNfts: () => void;
+    openCollections: () => void;
+    close: () => void;
+    on: (eventName: WalletEvent, handler: (data: object) => void) => void;
 }
 export default Wallet;
