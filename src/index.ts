@@ -40,6 +40,7 @@ class Wallet {
   private getFrame() {}
 
   private injectPortal() {
+    console.log("Injecting portal", this.portalId);
     const elem = document.getElementById(this.portalId);
     if (elem) return;
     // Start injecting iframe
@@ -189,8 +190,7 @@ class Wallet {
       ...(options?.permission || {}),
     };
     this.portalId = this.generatePortalId();
-    if (typeof window !== "undefined")
-      window.onload = this.injectPortal.bind(this);
+    this.injectPortal();
   }
 
   openWallet() {
@@ -213,8 +213,17 @@ class Wallet {
 
   on(eventName: WalletEvent, handler: (data: object) => void) {}
 }
-const wallet = new Wallet({ permission: { camera: false } });
 
-export { wallet };
+function initWallet() {
+  (window as any).Wallet = Wallet;
+}
+
+if (document.readyState === "complete") {
+  initWallet();
+} else if ((window as any).attachEvent) {
+  (window as any).attachEvent(`onload`, initWallet);
+} else {
+  window.addEventListener(`load`, initWallet, false);
+}
 
 export default Wallet;
