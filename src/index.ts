@@ -1,3 +1,8 @@
+import Benefit from "./benefit";
+import Session from "./session";
+import NFT from "./nft";
+import Collection from "./collection";
+
 type WalletPermissionConfig = Partial<{
   "clipboard-read": boolean;
   "clipboard-write": boolean;
@@ -21,6 +26,7 @@ class Wallet {
   private client_id = "default";
   private portalId = ``;
   private walletPermissions: WalletPermissionConfig;
+  private session: Session = new Session();
 
   private generateRandomnString = (length: number) => {
     var result = "";
@@ -193,23 +199,60 @@ class Wallet {
     }
   }
 
+  /**
+   * Opens wallet in default page. Login flow will be triggered if user is not loggedin
+   */
   openWallet = () => {
     document
       .getElementById(this.portalId)
       ?.setAttribute("style", "display: block;");
   };
 
-  openBenefit = (benefitId: string) => {};
+  /**
+   * Opens wallet with autoclose on successsfull login operation.
+   * No op if already loggedin.
+   * @param options.forced Open wallet and force login user, even if user is
+   * already loggedin in wallet. Autoclose after successfull login
+   */
+  login = async (options?: { forced: boolean }) => {};
 
-  openNftDetail = () => {};
+  /**
+   * Opens wallet in logout page
+   * @param options.clearUserSessionOnly Deletes token from current browser
+   * cache only. This will not logout user from wallet
+   */
+  logout = async (options?: { clearUserSessionOnly: boolean }) => {};
+
+  benefit = (benefitId: string): Benefit => {
+    return new Benefit(benefitId, this.session, this.baseUrl);
+  };
+
+  nft = (nftId: string): NFT => {
+    return new NFT(nftId, this.session, this.baseUrl);
+  };
+
+  listCollections = (filters: any): Collection[] => {
+    return [];
+  };
+
+  collection = (id: string) => {
+    return new Collection("", this.session, this.baseUrl);
+  };
 
   openMyNfts = () => {};
-
-  openCollections = () => {};
 
   close = () => {
     document.getElementById(this.portalId)?.setAttribute("style", "");
   };
+
+  /**
+   * 
+   * @param whitelistId WhitelistId be uniquely shared with every client for 
+   * specific user case 
+   */
+  whitelist = (whitelistId: string) => {
+
+  }
 
   on = (eventName: WalletEvent, handler: (data: object) => void) => {};
 }
