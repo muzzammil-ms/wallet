@@ -2,6 +2,7 @@ import Benefit from "./benefit";
 import Session from "./session";
 import NFT from "./nft";
 import Collection from "./collection";
+import { ILoginEvent, WalletEvent, WalletEventPayloadMap } from "./events";
 
 type WalletPermissionConfig = Partial<{
   "clipboard-read": boolean;
@@ -17,16 +18,21 @@ type WalletOptions = Partial<{
   permission: WalletPermissionConfig;
 }>;
 
-const WalletEventList = ["LOGIN", "LOGOUT", "OPEN", "BEFORE_CLOSE"] as const;
-
-type WalletEvent = typeof WalletEventList[number];
+type EventOptions = {
+  once?: boolean;
+};
 
 class Wallet {
   private readonly baseUrl = "https://wallet.metasky.me";
   private client_id = "default";
   private portalId = ``;
+  private iframeId = ``;
   private walletPermissions: WalletPermissionConfig;
-  private session: Session = new Session();
+  private session: Session;
+  private eventHandlersMap: Map<
+    WalletEvent,
+    { options?: EventOptions; handler: Function }[]
+  > = new Map();
 
   private generateRandomnString = (length: number) => {
     var result = "";
@@ -143,7 +149,7 @@ class Wallet {
      * Create Iframe
      */
     const iframe = document.createElement(`iframe`);
-    iframe.setAttribute("src", this.baseUrl);
+    iframe.setAttribute("src", "");
     iframe.setAttribute("frameborder", "0");
     iframe.setAttribute("allowFullScreen", "true");
     iframe.setAttribute(
@@ -153,6 +159,7 @@ class Wallet {
         .join(";")
     );
     iframe.setAttribute("class", `iframe`);
+    iframe.setAttribute("id", this.iframeId);
     /**
      * Overlay
      */
@@ -181,6 +188,17 @@ class Wallet {
     document.body.appendChild(portal);
   };
 
+  private handleEvent = (e: { event: WalletEvent; payload: any }) => {
+    const registeredhandlers = this.eventHandlersMap.get(e.event) || [];
+    registeredhandlers.forEach((handler) => {
+      handler.handler(e.payload);
+    });
+    this.eventHandlersMap.set(
+      e.event,
+      registeredhandlers.filter((handler) => !handler.options?.once)
+    );
+  };
+
   constructor(options?: WalletOptions) {
     this.client_id = options?.client_id || "default";
     this.walletPermissions = {
@@ -193,19 +211,39 @@ class Wallet {
       ...(options?.permission || {}),
     };
     this.portalId = this.generatePortalId();
+    this.iframeId = `${this.portalId}-iframe`;
+    this.session = new Session(this.iframeId);
     if (typeof window !== "undefined") {
-      let ip = this.injectPortal;
-      ip();
+      this.on("LOGIN", (payload) =>
+        this.session.onLogin(payload.payload.bearerToken)
+      );
+      this.on("LOGOUT", () => this.session.onLogout());
+      window.addEventListener("message", (e) => {
+        try {
+          const data = JSON.parse(e.data);
+          this.handleEvent(data);
+        } catch (error) {}
+      });
+      this.injectPortal();
     }
   }
 
   /**
    * Opens wallet in default page. Login flow will be triggered if user is not loggedin
    */
-  openWallet = () => {
+  openWallet = (path?: string) => {
+    document
+      .getElementById(this.iframeId)
+      ?.setAttribute("src", `${this.baseUrl}/${path}`);
     document
       .getElementById(this.portalId)
       ?.setAttribute("style", "display: block;");
+  };
+
+  close = () => {
+    document.getElementById(this.iframeId)?.setAttribute("src", ``);
+    document.getElementById(this.portalId)?.setAttribute("style", ``);
+    this.handleEvent({ event: "BEFORE_CLOSE", payload: {} });
   };
 
   /**
@@ -214,14 +252,33 @@ class Wallet {
    * @param options.forced Open wallet and force login user, even if user is
    * already loggedin in wallet. Autoclose after successfull login
    */
-  login = async (options?: { forced: boolean }) => {};
+  login = async (options?: { forced: boolean }) => {
+    const isLoginRequired = options?.forced || !this.session.isLoggedIn;
+    if (isLoginRequired) {
+      this.openWallet("/login");
+      const onLoginSuccess = (data: ILoginEvent) => {
+        this.close();
+      };
+      const onFrameClose = () => {
+        this.off("LOGIN", onLoginSuccess);
+      };
+      this.on("LOGIN", onLoginSuccess, { once: true });
+      this.on("BEFORE_CLOSE", onFrameClose, { once: true });
+    }
+  };
 
   /**
    * Opens wallet in logout page
    * @param options.clearUserSessionOnly Deletes token from current browser
    * cache only. This will not logout user from wallet
    */
-  logout = async (options?: { clearUserSessionOnly: boolean }) => {};
+  logout = async (options?: { clearUserSessionOnly: boolean }) => {
+    if (options?.clearUserSessionOnly) {
+      this.session.onLogout();
+      return;
+    }
+    this.openWallet("/logout");
+  };
 
   benefit = (benefitId: string): Benefit => {
     return new Benefit(benefitId, this.session, this.baseUrl);
@@ -241,20 +298,32 @@ class Wallet {
 
   openMyNfts = () => {};
 
-  close = () => {
-    document.getElementById(this.portalId)?.setAttribute("style", "");
+  /**
+   *
+   * @param whitelistId WhitelistId be uniquely shared with every client for
+   * specific user case
+   */
+  whitelist = (whitelistId: string) => {};
+
+  on = <T extends WalletEvent>(
+    eventName: T,
+    handler: (data: WalletEventPayloadMap[T]) => void,
+    options?: EventOptions
+  ) => {
+    const handlers = this.eventHandlersMap.get(eventName) || [];
+    this.eventHandlersMap.set(eventName, [...handlers, { handler, options }]);
   };
 
-  /**
-   * 
-   * @param whitelistId WhitelistId be uniquely shared with every client for 
-   * specific user case 
-   */
-  whitelist = (whitelistId: string) => {
-
-  }
-
-  on = (eventName: WalletEvent, handler: (data: object) => void) => {};
+  off = <T extends WalletEvent>(
+    eventName: T,
+    handler: (data: WalletEventPayloadMap[T]) => void
+  ) => {
+    const handlers = this.eventHandlersMap.get(eventName) || [];
+    this.eventHandlersMap.set(
+      eventName,
+      handlers.filter((_handler) => _handler.handler !== handler)
+    );
+  };
 }
 
 if (typeof window !== "undefined") {

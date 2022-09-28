@@ -1,13 +1,31 @@
+import jwt_decode from "jwt-decode";
+
 class Session {
-  private bearerToken: string = ``;
-  constructor() {}
+  private _frameId: string = ``;
+  private readonly bearerTokenKey = "BearerToken";
+  constructor(frameId: string) {
+    this._frameId = frameId;
+  }
 
-  onLogin = (bearerToken: string) => {};
+  onLogin = (bearerToken: string) => {
+    localStorage.setItem(this.bearerTokenKey, bearerToken);
+  };
 
-  onLogout = () => {};
+  onLogout = () => {
+    localStorage.removeItem(this.bearerTokenKey);
+  };
+
+  get frameId() {
+    return this._frameId;
+  }
 
   get isLoggedIn() {
-    return true;
+    const token = localStorage.getItem(this.bearerTokenKey);
+    if (!token) return false;
+    const decodedToken: any = jwt_decode(token);
+    const currentTime = Date.now() / 1000;
+    const expTime = decodedToken && decodedToken?.exp;
+    return expTime > currentTime;
   }
 }
 
