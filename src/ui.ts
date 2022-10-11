@@ -15,7 +15,7 @@ class WalletUI {
   private onClose: Function;
   private onOpen: Function;
 
-  private generateRandomnString = (length: number) => {
+  static generateRandomnString = (length: number) => {
     var result = "";
     var characters =
       "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -26,8 +26,8 @@ class WalletUI {
     return result;
   };
 
-  private generatePortalId = () => {
-    return `skywallet-${this.generateRandomnString(10)}`;
+  static generatePortalId = () => {
+    return `skywallet-${WalletUI.generateRandomnString(10)}`;
   };
 
   private injectPortal = () => {
@@ -185,7 +185,7 @@ class WalletUI {
       },
       ...(options?.permission || {}),
     };
-    this.portalId = this.generatePortalId();
+    this.portalId = WalletUI.generatePortalId();
     this.iframeId = `${this.portalId}-iframe`;
     if (typeof window !== "undefined") {
       this.injectPortal();
@@ -195,10 +195,10 @@ class WalletUI {
   /**
    * Opens wallet in default page. Login flow will be triggered if user is not loggedin
    */
-  openWallet = (path?: string) => {
+  openWallet = (path = "") => {
     document
       .getElementById(this.iframeId)
-      ?.setAttribute("src", `${this.baseUrl}/${path || ""}`);
+      ?.setAttribute("src", `${this.baseUrl}/${path}`);
     document
       .getElementById(this.portalId)
       ?.setAttribute("style", "display: block;");

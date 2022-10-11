@@ -24,9 +24,7 @@ class Wallet {
   private ui: WalletUI;
 
   private handleEvent = (e: { event: WalletEvent; payload: any }) => {
-    console.log("Handle Event", e);
     const registeredhandlers = this.eventHandlersMap.get(e.event) || [];
-    console.log("registeredhandlers", registeredhandlers);
     registeredhandlers.forEach((handler) => {
       handler.handler(e.payload);
     });
@@ -50,14 +48,12 @@ class Wallet {
     );
     if (typeof window !== "undefined") {
       this.on("LOGIN", (payload) => {
-        console.log("Session lOgin Start", this.session, this.session.onLogin);
         this.session.onLogin(payload.payload.bearerToken);
       });
       this.on("LOGOUT", () => this.session.onLogout());
       window.addEventListener("message", (e) => {
         try {
           if (e.origin !== this.ui.baseUrl) return;
-          console.log("Message", e);
           const data = JSON.parse(e.data);
           this.handleEvent(data);
         } catch (error) {}
@@ -81,17 +77,16 @@ class Wallet {
    */
   login = async (options?: { forced: boolean }) => {
     const isLoginRequired = options?.forced || !this.session.isLoggedIn;
-    if (isLoginRequired) {
-      this.openWallet("/login");
-      const onLoginSuccess = (data: ILoginEvent) => {
-        this.close();
-      };
-      const onFrameClose = () => {
-        this.off("LOGIN", onLoginSuccess);
-      };
-      this.on("LOGIN", onLoginSuccess, { once: true });
-      this.on("BEFORE_CLOSE", onFrameClose, { once: true });
-    }
+    if (!isLoginRequired) return;
+    this.openWallet("/login");
+    const onLoginSuccess = (data: ILoginEvent) => {
+      this.close();
+    };
+    const onFrameClose = () => {
+      this.off("LOGIN", onLoginSuccess);
+    };
+    this.on("LOGIN", onLoginSuccess, { once: true });
+    this.on("BEFORE_CLOSE", onFrameClose, { once: true });
   };
 
   /**

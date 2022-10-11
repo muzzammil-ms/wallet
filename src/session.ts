@@ -1,19 +1,18 @@
 import jwt_decode from "jwt-decode";
 
 class Session {
-  private readonly bearerTokenKey = "BearerToken";
+  static readonly bearerTokenKey = "BearerToken";
 
   onLogin = (bearerToken: string) => {
-    console.log("Setting localstore", this.bearerTokenKey, bearerToken);
-    localStorage.setItem(this.bearerTokenKey, bearerToken);
+    localStorage.setItem(Session.bearerTokenKey, bearerToken);
   };
 
   onLogout = () => {
-    localStorage.removeItem(this.bearerTokenKey);
+    localStorage.removeItem(Session.bearerTokenKey);
   };
 
   get isLoggedIn() {
-    const token = localStorage.getItem(this.bearerTokenKey);
+    const token = localStorage.getItem(Session.bearerTokenKey);
     if (!token) return false;
     const decodedToken: any = jwt_decode(token);
     const currentTime = Date.now() / 1000;
