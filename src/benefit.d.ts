@@ -1,6 +1,10 @@
 import Session from "./session";
+import WalletUI from "./ui";
 declare class Benefit {
-    constructor(id: string, session: Session, walletBaseUrl: string);
+    private id;
+    private session;
+    private ui;
+    constructor(id: string, session: Session, ui: WalletUI);
     getDetails: () => Promise<void>;
     /**
      * @discuss Should be improved to return reason incase user is not allowed to claim NFT

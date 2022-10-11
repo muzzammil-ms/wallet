@@ -2,12 +2,7 @@ import Benefit from "./benefit";
 import NFT from "./nft";
 import Collection from "./collection";
 import { WalletEventPayloadMap } from "./events";
-declare type WalletPermissionConfig = Partial<{
-    "clipboard-read": boolean;
-    "clipboard-write": boolean;
-    camera: boolean;
-    microphone: boolean;
-}>;
+import { WalletPermissionConfig } from "./ui";
 declare type WalletOptions = Partial<{
     client_id: string;
     permission: WalletPermissionConfig;
@@ -16,21 +11,12 @@ declare type EventOptions = {
     once?: boolean;
 };
 declare class Wallet {
-    private readonly baseUrl;
     private client_id;
-    private portalId;
-    private iframeId;
-    private walletPermissions;
     private session;
     private eventHandlersMap;
-    private generateRandomnString;
-    private generatePortalId;
-    private injectPortal;
+    private ui;
     private handleEvent;
     constructor(options?: WalletOptions);
-    /**
-     * Opens wallet in default page. Login flow will be triggered if user is not loggedin
-     */
     openWallet: (path?: string) => void;
     close: () => void;
     /**
@@ -50,8 +36,8 @@ declare class Wallet {
     logout: (options?: {
         clearUserSessionOnly: boolean;
     }) => Promise<void>;
-    benefit: (benefitId: string) => Benefit;
-    nft: (nftId: string) => NFT;
+    benefit: (id: string) => Benefit;
+    nft: (id: string) => NFT;
     listCollections: (filters: any) => Collection[];
     collection: (id: string) => Collection;
     openMyNfts: () => void;

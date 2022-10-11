@@ -1,7 +1,15 @@
 import Session from "./session";
+import WalletUI from "./ui";
 
 class Benefit {
-  constructor(id: string, session: Session, walletBaseUrl: string) {}
+  private id: string;
+  private session: Session;
+  private ui: WalletUI;
+  constructor(id: string, session: Session, ui: WalletUI) {
+    this.session = session;
+    this.ui = ui;
+    this.id = id;
+  }
 
   getDetails = async () => {};
 
@@ -17,7 +25,9 @@ class Benefit {
 
   claim = () => {};
 
-  open = () => {};
+  open = () => {
+    this.ui.openWallet(`/benefit-details/${this.id}`);
+  };
 }
 
 export default Benefit;

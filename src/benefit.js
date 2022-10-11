@@ -37,7 +37,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var Benefit = /** @class */ (function () {
-    function Benefit(id, session, walletBaseUrl) {
+    function Benefit(id, session, ui) {
         var _this = this;
         this.getDetails = function () { return __awaiter(_this, void 0, void 0, function () { return __generator(this, function (_a) {
             return [2 /*return*/];
@@ -52,7 +52,12 @@ var Benefit = /** @class */ (function () {
             return false;
         };
         this.claim = function () { };
-        this.open = function () { };
+        this.open = function () {
+            _this.ui.openWallet("/benefit-details/".concat(_this.id));
+        };
+        this.session = session;
+        this.ui = ui;
+        this.id = id;
     }
     return Benefit;
 }());

@@ -1,11 +1,7 @@
 import jwt_decode from "jwt-decode";
 
 class Session {
-  private _frameId: string = ``;
   private readonly bearerTokenKey = "BearerToken";
-  constructor(frameId: string) {
-    this._frameId = frameId;
-  }
 
   onLogin = (bearerToken: string) => {
     localStorage.setItem(this.bearerTokenKey, bearerToken);
@@ -14,10 +10,6 @@ class Session {
   onLogout = () => {
     localStorage.removeItem(this.bearerTokenKey);
   };
-
-  get frameId() {
-    return this._frameId;
-  }
 
   get isLoggedIn() {
     const token = localStorage.getItem(this.bearerTokenKey);
