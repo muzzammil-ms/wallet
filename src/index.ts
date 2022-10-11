@@ -17,20 +17,18 @@ type EventOptions = {
 class Wallet {
   private client_id = "default";
   private session: Session;
-  private eventHandlersMap: Map<
-    WalletEvent,
-    { options?: EventOptions; handler: Function }[]
-  > = new Map();
+  private eventHandlersMap: {
+    [key in WalletEvent]?: { options?: EventOptions; handler: Function }[];
+  } = {};
   private ui: WalletUI;
 
   private handleEvent = (e: { event: WalletEvent; payload: any }) => {
-    const registeredhandlers = this.eventHandlersMap.get(e.event) || [];
+    const registeredhandlers = this.eventHandlersMap[e.event] || [];
     registeredhandlers.forEach((handler) => {
-      handler.handler(e.payload);
+      handler.handler(e);
     });
-    this.eventHandlersMap.set(
-      e.event,
-      registeredhandlers.filter((handler) => !handler.options?.once)
+    this.eventHandlersMap[e.event] = registeredhandlers.filter(
+      (handler) => !handler.options?.once
     );
   };
 
@@ -47,14 +45,15 @@ class Wallet {
       options
     );
     if (typeof window !== "undefined") {
-      this.on("LOGIN", (payload) => {
+      this.on("LOGIN_SUCCESS", (payload) => {
         this.session.onLogin(payload.payload.bearerToken);
       });
-      this.on("LOGOUT", () => this.session.onLogout());
+      this.on("LOGOUT_SUCESS", () => this.session.onLogout());
       window.addEventListener("message", (e) => {
         try {
           if (e.origin !== this.ui.baseUrl) return;
           const data = JSON.parse(e.data);
+          if (!data.event) return;
           this.handleEvent(data);
         } catch (error) {}
       });
@@ -83,9 +82,9 @@ class Wallet {
       this.close();
     };
     const onFrameClose = () => {
-      this.off("LOGIN", onLoginSuccess);
+      this.off("LOGIN_SUCCESS", onLoginSuccess);
     };
-    this.on("LOGIN", onLoginSuccess, { once: true });
+    this.on("LOGIN_SUCCESS", onLoginSuccess, { once: true });
     this.on("BEFORE_CLOSE", onFrameClose, { once: true });
   };
 
@@ -99,7 +98,7 @@ class Wallet {
       this.session.onLogout();
       return;
     }
-    this.openWallet("/logout");
+    this.openWallet("/profile?showLogoutSheet=true");
   };
 
   benefit = (id: string): Benefit => {
@@ -136,18 +135,17 @@ class Wallet {
     handler: (data: WalletEventPayloadMap[T]) => void,
     options?: EventOptions
   ) => {
-    const handlers = this.eventHandlersMap.get(eventName) || [];
-    this.eventHandlersMap.set(eventName, [...handlers, { handler, options }]);
+    const handlers = this.eventHandlersMap[eventName] || [];
+    this.eventHandlersMap[eventName] = [...handlers, { handler, options }];
   };
 
   off = <T extends WalletEvent>(
     eventName: T,
     handler: (data: WalletEventPayloadMap[T]) => void
   ) => {
-    const handlers = this.eventHandlersMap.get(eventName) || [];
-    this.eventHandlersMap.set(
-      eventName,
-      handlers.filter((_handler) => _handler.handler !== handler)
+    const handlers = this.eventHandlersMap[eventName] || [];
+    this.eventHandlersMap[eventName] = handlers.filter(
+      (_handler) => _handler.handler !== handler
     );
   };
 }

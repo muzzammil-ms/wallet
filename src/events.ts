@@ -1,4 +1,9 @@
-const WalletEventList = ["LOGIN", "LOGOUT", "OPEN", "BEFORE_CLOSE"] as const;
+const WalletEventList = [
+  "LOGIN_SUCCESS",
+  "LOGOUT_SUCESS",
+  "OPEN",
+  "BEFORE_CLOSE",
+] as const;
 
 export type WalletEvent = typeof WalletEventList[number];
 
@@ -7,7 +12,7 @@ interface IBaseEvent {
 }
 
 export interface ILoginEvent extends IBaseEvent {
-  event: "LOGIN";
+  event: "LOGIN_SUCCESS";
   payload: {
     user: {};
     bearerToken: string;
@@ -15,7 +20,7 @@ export interface ILoginEvent extends IBaseEvent {
 }
 
 export interface ILogoutEvent extends IBaseEvent {
-  event: "LOGOUT";
+  event: "LOGOUT_SUCESS";
 }
 
 export interface IOpenEvent extends IBaseEvent {
@@ -27,8 +32,8 @@ export interface IBeforeCloseEvent extends IBaseEvent {
 }
 
 export type WalletEventPayloadMap = {
-  LOGIN: ILoginEvent;
-  LOGOUT: ILogoutEvent;
+  LOGIN_SUCCESS: ILoginEvent;
+  LOGOUT_SUCESS: ILogoutEvent;
   OPEN: IOpenEvent;
   BEFORE_CLOSE: IBeforeCloseEvent;
 };

@@ -1,3 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var WalletEventList = ["LOGIN", "LOGOUT", "OPEN", "BEFORE_CLOSE"];
+var WalletEventList = [
+    "LOGIN_SUCCESS",
+    "LOGOUT_SUCESS",
+    "OPEN",
+    "BEFORE_CLOSE",
+];

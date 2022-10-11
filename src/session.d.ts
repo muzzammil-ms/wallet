@@ -1,5 +1,5 @@
 declare class Session {
-    private readonly bearerTokenKey;
+    static readonly bearerTokenKey = "BearerToken";
     onLogin: (bearerToken: string) => void;
     onLogout: () => void;
     get isLoggedIn(): boolean;

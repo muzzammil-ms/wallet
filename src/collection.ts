@@ -28,7 +28,7 @@ class Collection {
   open = (filters: any, options?: { uiState: UIPageState }) => {
     let path = `/collection-details?filters={"collectionIds":["${this.id}"]}`;
     if (options?.uiState === "NFT_LIST") {
-      path = `marketplace/listings?filters={"collectionIds":["${this.id}"]}`;
+      path = `/marketplace/listings?filters={"collectionIds":["${this.id}"]}`;
     }
     this.ui.openWallet(path);
   };

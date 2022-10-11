@@ -47,7 +47,7 @@ declare class Wallet {
      * specific user case
      */
     whitelist: (whitelistId: string) => void;
-    on: <T extends "LOGIN" | "LOGOUT" | "OPEN" | "BEFORE_CLOSE">(eventName: T, handler: (data: WalletEventPayloadMap[T]) => void, options?: EventOptions) => void;
-    off: <T extends "LOGIN" | "LOGOUT" | "OPEN" | "BEFORE_CLOSE">(eventName: T, handler: (data: WalletEventPayloadMap[T]) => void) => void;
+    on: <T extends "LOGIN_SUCCESS" | "LOGOUT_SUCESS" | "OPEN" | "BEFORE_CLOSE">(eventName: T, handler: (data: WalletEventPayloadMap[T]) => void, options?: EventOptions) => void;
+    off: <T extends "LOGIN_SUCCESS" | "LOGOUT_SUCESS" | "OPEN" | "BEFORE_CLOSE">(eventName: T, handler: (data: WalletEventPayloadMap[T]) => void) => void;
 }
 export default Wallet;

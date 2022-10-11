@@ -57,15 +57,13 @@ var Wallet = /** @class */ (function () {
     function Wallet(options) {
         var _this = this;
         this.client_id = "default";
-        this.eventHandlersMap = new Map();
+        this.eventHandlersMap = {};
         this.handleEvent = function (e) {
-            console.log("Handle Event", e);
-            var registeredhandlers = _this.eventHandlersMap.get(e.event) || [];
-            console.log("registeredhandlers", registeredhandlers);
+            var registeredhandlers = _this.eventHandlersMap[e.event] || [];
             registeredhandlers.forEach(function (handler) {
-                handler.handler(e.payload);
+                handler.handler(e);
             });
-            _this.eventHandlersMap.set(e.event, registeredhandlers.filter(function (handler) { var _a; return !((_a = handler.options) === null || _a === void 0 ? void 0 : _a.once); }));
+            _this.eventHandlersMap[e.event] = registeredhandlers.filter(function (handler) { var _a; return !((_a = handler.options) === null || _a === void 0 ? void 0 : _a.once); });
         };
         this.openWallet = function (path) {
             _this.ui.openWallet(path);
@@ -80,21 +78,21 @@ var Wallet = /** @class */ (function () {
          * already loggedin in wallet. Autoclose after successfull login
          */
         this.login = function (options) { return __awaiter(_this, void 0, void 0, function () {
-            var isLoginRequired, onLoginSuccess_1, onFrameClose;
+            var isLoginRequired, onLoginSuccess, onFrameClose;
             var _this = this;
             return __generator(this, function (_a) {
                 isLoginRequired = (options === null || options === void 0 ? void 0 : options.forced) || !this.session.isLoggedIn;
-                if (isLoginRequired) {
-                    this.openWallet("/login");
-                    onLoginSuccess_1 = function (data) {
-                        _this.close();
-                    };
-                    onFrameClose = function () {
-                        _this.off("LOGIN", onLoginSuccess_1);
-                    };
-                    this.on("LOGIN", onLoginSuccess_1, { once: true });
-                    this.on("BEFORE_CLOSE", onFrameClose, { once: true });
-                }
+                if (!isLoginRequired)
+                    return [2 /*return*/];
+                this.openWallet("/login");
+                onLoginSuccess = function (data) {
+                    _this.close();
+                };
+                onFrameClose = function () {
+                    _this.off("LOGIN_SUCCESS", onLoginSuccess);
+                };
+                this.on("LOGIN_SUCCESS", onLoginSuccess, { once: true });
+                this.on("BEFORE_CLOSE", onFrameClose, { once: true });
                 return [2 /*return*/];
             });
         }); };
@@ -109,7 +107,7 @@ var Wallet = /** @class */ (function () {
                     this.session.onLogout();
                     return [2 /*return*/];
                 }
-                this.openWallet("/logout");
+                this.openWallet("/profile?showLogoutSheet=true");
                 return [2 /*return*/];
             });
         }); };
@@ -137,12 +135,12 @@ var Wallet = /** @class */ (function () {
             _this.openWallet("/login?whitelist=true");
         };
         this.on = function (eventName, handler, options) {
-            var handlers = _this.eventHandlersMap.get(eventName) || [];
-            _this.eventHandlersMap.set(eventName, __spreadArray(__spreadArray([], handlers, true), [{ handler: handler, options: options }], false));
+            var handlers = _this.eventHandlersMap[eventName] || [];
+            _this.eventHandlersMap[eventName] = __spreadArray(__spreadArray([], handlers, true), [{ handler: handler, options: options }], false);
         };
         this.off = function (eventName, handler) {
-            var handlers = _this.eventHandlersMap.get(eventName) || [];
-            _this.eventHandlersMap.set(eventName, handlers.filter(function (_handler) { return _handler.handler !== handler; }));
+            var handlers = _this.eventHandlersMap[eventName] || [];
+            _this.eventHandlersMap[eventName] = handlers.filter(function (_handler) { return _handler.handler !== handler; });
         };
         this.client_id = (options === null || options === void 0 ? void 0 : options.client_id) || "default";
         this.session = new session_1.default();
@@ -152,17 +150,17 @@ var Wallet = /** @class */ (function () {
             _this.handleEvent({ event: "OPEN", payload: {} });
         }, options);
         if (typeof window !== "undefined") {
-            this.on("LOGIN", function (payload) {
-                console.log("Session lOgin Start", _this.session, _this.session.onLogin);
+            this.on("LOGIN_SUCCESS", function (payload) {
                 _this.session.onLogin(payload.payload.bearerToken);
             });
-            this.on("LOGOUT", function () { return _this.session.onLogout(); });
+            this.on("LOGOUT_SUCESS", function () { return _this.session.onLogout(); });
             window.addEventListener("message", function (e) {
                 try {
                     if (e.origin !== _this.ui.baseUrl)
                         return;
-                    console.log("Message", e);
                     var data = JSON.parse(e.data);
+                    if (!data.event)
+                        return;
                     _this.handleEvent(data);
                 }
                 catch (error) { }

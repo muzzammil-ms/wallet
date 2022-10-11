@@ -17,18 +17,6 @@ var WalletUI = /** @class */ (function () {
         this.baseUrl = "http://localhost:3005";
         this.portalId = "";
         this.iframeId = "";
-        this.generateRandomnString = function (length) {
-            var result = "";
-            var characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-            var charactersLength = characters.length;
-            for (var i = 0; i < length; i++) {
-                result += characters.charAt(Math.floor(Math.random() * charactersLength));
-            }
-            return result;
-        };
-        this.generatePortalId = function () {
-            return "skywallet-".concat(_this.generateRandomnString(10));
-        };
         this.injectPortal = function () {
             var elem = document.getElementById(_this.portalId);
             if (elem)
@@ -85,8 +73,9 @@ var WalletUI = /** @class */ (function () {
          */
         this.openWallet = function (path) {
             var _a, _b;
+            if (path === void 0) { path = ""; }
             (_a = document
-                .getElementById(_this.iframeId)) === null || _a === void 0 ? void 0 : _a.setAttribute("src", "".concat(_this.baseUrl, "/").concat(path || ""));
+                .getElementById(_this.iframeId)) === null || _a === void 0 ? void 0 : _a.setAttribute("src", "".concat(_this.baseUrl).concat(path));
             (_b = document
                 .getElementById(_this.portalId)) === null || _b === void 0 ? void 0 : _b.setAttribute("style", "display: block;");
             _this.onOpen();
@@ -105,12 +94,24 @@ var WalletUI = /** @class */ (function () {
             "clipboard-write": true,
             microphone: true,
         }, ((options === null || options === void 0 ? void 0 : options.permission) || {}));
-        this.portalId = this.generatePortalId();
+        this.portalId = WalletUI.generatePortalId();
         this.iframeId = "".concat(this.portalId, "-iframe");
         if (typeof window !== "undefined") {
             this.injectPortal();
         }
     }
+    WalletUI.generateRandomnString = function (length) {
+        var result = "";
+        var characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        var charactersLength = characters.length;
+        for (var i = 0; i < length; i++) {
+            result += characters.charAt(Math.floor(Math.random() * charactersLength));
+        }
+        return result;
+    };
+    WalletUI.generatePortalId = function () {
+        return "skywallet-".concat(WalletUI.generateRandomnString(10));
+    };
     return WalletUI;
 }());
 exports.default = WalletUI;

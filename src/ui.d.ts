@@ -12,8 +12,8 @@ declare class WalletUI {
     private walletPermissions;
     private onClose;
     private onOpen;
-    private generateRandomnString;
-    private generatePortalId;
+    static generateRandomnString: (length: number) => string;
+    static generatePortalId: () => string;
     private injectPortal;
     constructor(onClose: () => void, onOpen: () => void, options?: {
         permission?: WalletPermissionConfig;

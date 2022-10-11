@@ -198,7 +198,7 @@ class WalletUI {
   openWallet = (path = "") => {
     document
       .getElementById(this.iframeId)
-      ?.setAttribute("src", `${this.baseUrl}/${path}`);
+      ?.setAttribute("src", `${this.baseUrl}${path}`);
     document
       .getElementById(this.portalId)
       ?.setAttribute("style", "display: block;");

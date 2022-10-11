@@ -15,7 +15,7 @@ var Collection = /** @class */ (function () {
         this.open = function (filters, options) {
             var path = "/collection-details?filters={\"collectionIds\":[\"".concat(_this.id, "\"]}");
             if ((options === null || options === void 0 ? void 0 : options.uiState) === "NFT_LIST") {
-                path = "marketplace/listings?filters={\"collectionIds\":[\"".concat(_this.id, "\"]}");
+                path = "/marketplace/listings?filters={\"collectionIds\":[\"".concat(_this.id, "\"]}");
             }
             _this.ui.openWallet(path);
         };

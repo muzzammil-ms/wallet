@@ -6,19 +6,16 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var jwt_decode_1 = __importDefault(require("jwt-decode"));
 var Session = /** @class */ (function () {
     function Session() {
-        var _this = this;
-        this.bearerTokenKey = "BearerToken";
         this.onLogin = function (bearerToken) {
-            console.log("Setting localstore", _this.bearerTokenKey, bearerToken);
-            localStorage.setItem(_this.bearerTokenKey, bearerToken);
+            localStorage.setItem(Session.bearerTokenKey, bearerToken);
         };
         this.onLogout = function () {
-            localStorage.removeItem(_this.bearerTokenKey);
+            localStorage.removeItem(Session.bearerTokenKey);
         };
     }
     Object.defineProperty(Session.prototype, "isLoggedIn", {
         get: function () {
-            var token = localStorage.getItem(this.bearerTokenKey);
+            var token = localStorage.getItem(Session.bearerTokenKey);
             if (!token)
                 return false;
             var decodedToken = (0, jwt_decode_1.default)(token);
@@ -29,6 +26,7 @@ var Session = /** @class */ (function () {
         enumerable: false,
         configurable: true
     });
+    Session.bearerTokenKey = "BearerToken";
     return Session;
 }());
 exports.default = Session;
