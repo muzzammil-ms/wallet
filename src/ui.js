@@ -12,9 +12,9 @@ var __assign = (this && this.__assign) || function () {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var WalletUI = /** @class */ (function () {
-    function WalletUI(onClose, options) {
+    function WalletUI(onClose, onOpen, options) {
         var _this = this;
-        this.baseUrl = "https://wallet.metasky.me";
+        this.baseUrl = "http://localhost:3005";
         this.portalId = "";
         this.iframeId = "";
         this.generateRandomnString = function (length) {
@@ -86,9 +86,10 @@ var WalletUI = /** @class */ (function () {
         this.openWallet = function (path) {
             var _a, _b;
             (_a = document
-                .getElementById(_this.iframeId)) === null || _a === void 0 ? void 0 : _a.setAttribute("src", "".concat(_this.baseUrl, "/").concat(path));
+                .getElementById(_this.iframeId)) === null || _a === void 0 ? void 0 : _a.setAttribute("src", "".concat(_this.baseUrl, "/").concat(path || ""));
             (_b = document
                 .getElementById(_this.portalId)) === null || _b === void 0 ? void 0 : _b.setAttribute("style", "display: block;");
+            _this.onOpen();
         };
         this.close = function () {
             var _a, _b;
@@ -97,6 +98,7 @@ var WalletUI = /** @class */ (function () {
             _this.onClose();
         };
         this.onClose = onClose;
+        this.onOpen = onOpen;
         this.walletPermissions = __assign({
             camera: true,
             "clipboard-read": true,

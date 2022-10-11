@@ -9,6 +9,7 @@ var Session = /** @class */ (function () {
         var _this = this;
         this.bearerTokenKey = "BearerToken";
         this.onLogin = function (bearerToken) {
+            console.log("Setting localstore", _this.bearerTokenKey, bearerToken);
             localStorage.setItem(_this.bearerTokenKey, bearerToken);
         };
         this.onLogout = function () {

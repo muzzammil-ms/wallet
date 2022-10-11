@@ -13,7 +13,11 @@ var Collection = /** @class */ (function () {
             return [];
         };
         this.open = function (filters, options) {
-            _this.ui.openWallet("/benefit-details/".concat(_this.id));
+            var path = "/collection-details?filters={\"collectionIds\":[\"".concat(_this.id, "\"]}");
+            if ((options === null || options === void 0 ? void 0 : options.uiState) === "NFT_LIST") {
+                path = "marketplace/listings?filters={\"collectionIds\":[\"".concat(_this.id, "\"]}");
+            }
+            _this.ui.openWallet(path);
         };
         this.session = session;
         this.ui = ui;

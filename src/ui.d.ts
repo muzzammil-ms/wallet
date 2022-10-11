@@ -6,15 +6,16 @@ export declare type WalletPermissionConfig = Partial<{
 }>;
 export declare type WalletPermission = keyof WalletPermissionConfig;
 declare class WalletUI {
-    private readonly baseUrl;
+    readonly baseUrl = "http://localhost:3005";
     private portalId;
     private iframeId;
     private walletPermissions;
     private onClose;
+    private onOpen;
     private generateRandomnString;
     private generatePortalId;
     private injectPortal;
-    constructor(onClose: () => void, options?: {
+    constructor(onClose: () => void, onOpen: () => void, options?: {
         permission?: WalletPermissionConfig;
     });
     /**

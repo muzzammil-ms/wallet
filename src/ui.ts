@@ -8,11 +8,12 @@ export type WalletPermissionConfig = Partial<{
 export type WalletPermission = keyof WalletPermissionConfig;
 
 class WalletUI {
-  private readonly baseUrl = "https://wallet.metasky.me";
+  public readonly baseUrl = "http://localhost:3005";
   private portalId = ``;
   private iframeId = ``;
   private walletPermissions: WalletPermissionConfig;
   private onClose: Function;
+  private onOpen: Function;
 
   private generateRandomnString = (length: number) => {
     var result = "";
@@ -170,9 +171,11 @@ class WalletUI {
 
   constructor(
     onClose: () => void,
+    onOpen: () => void,
     options?: { permission?: WalletPermissionConfig }
   ) {
     this.onClose = onClose;
+    this.onOpen = onOpen;
     this.walletPermissions = {
       ...{
         camera: true,
@@ -195,10 +198,11 @@ class WalletUI {
   openWallet = (path?: string) => {
     document
       .getElementById(this.iframeId)
-      ?.setAttribute("src", `${this.baseUrl}/${path}`);
+      ?.setAttribute("src", `${this.baseUrl}/${path || ""}`);
     document
       .getElementById(this.portalId)
       ?.setAttribute("style", "display: block;");
+    this.onOpen();
   };
 
   close = () => {

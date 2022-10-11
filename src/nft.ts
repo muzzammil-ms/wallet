@@ -14,9 +14,9 @@ class NFT {
   }
 
   getDetails = () => {};
- 
+
   open = (options?: { uiState?: UIPageState }) => {
-    this.ui.openWallet("/");
+    this.ui.openWallet(`/nft-details/${this.id}`);
   };
 }
 

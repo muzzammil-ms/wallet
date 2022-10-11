@@ -4,6 +4,7 @@ class Session {
   private readonly bearerTokenKey = "BearerToken";
 
   onLogin = (bearerToken: string) => {
+    console.log("Setting localstore", this.bearerTokenKey, bearerToken);
     localStorage.setItem(this.bearerTokenKey, bearerToken);
   };
 

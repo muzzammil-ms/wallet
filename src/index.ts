@@ -24,7 +24,9 @@ class Wallet {
   private ui: WalletUI;
 
   private handleEvent = (e: { event: WalletEvent; payload: any }) => {
+    console.log("Handle Event", e);
     const registeredhandlers = this.eventHandlersMap.get(e.event) || [];
+    console.log("registeredhandlers", registeredhandlers);
     registeredhandlers.forEach((handler) => {
       handler.handler(e.payload);
     });
@@ -37,16 +39,25 @@ class Wallet {
   constructor(options?: WalletOptions) {
     this.client_id = options?.client_id || "default";
     this.session = new Session();
-    this.ui = new WalletUI(() => {
-      this.handleEvent({ event: "BEFORE_CLOSE", payload: {} });
-    }, options);
+    this.ui = new WalletUI(
+      () => {
+        this.handleEvent({ event: "BEFORE_CLOSE", payload: {} });
+      },
+      () => {
+        this.handleEvent({ event: "OPEN", payload: {} });
+      },
+      options
+    );
     if (typeof window !== "undefined") {
-      this.on("LOGIN", (payload) =>
-        this.session.onLogin(payload.payload.bearerToken)
-      );
+      this.on("LOGIN", (payload) => {
+        console.log("Session lOgin Start", this.session, this.session.onLogin);
+        this.session.onLogin(payload.payload.bearerToken);
+      });
       this.on("LOGOUT", () => this.session.onLogout());
       window.addEventListener("message", (e) => {
         try {
+          if (e.origin !== this.ui.baseUrl) return;
+          console.log("Message", e);
           const data = JSON.parse(e.data);
           this.handleEvent(data);
         } catch (error) {}

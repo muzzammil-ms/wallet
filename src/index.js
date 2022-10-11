@@ -59,7 +59,9 @@ var Wallet = /** @class */ (function () {
         this.client_id = "default";
         this.eventHandlersMap = new Map();
         this.handleEvent = function (e) {
+            console.log("Handle Event", e);
             var registeredhandlers = _this.eventHandlersMap.get(e.event) || [];
+            console.log("registeredhandlers", registeredhandlers);
             registeredhandlers.forEach(function (handler) {
                 handler.handler(e.payload);
             });
@@ -146,14 +148,20 @@ var Wallet = /** @class */ (function () {
         this.session = new session_1.default();
         this.ui = new ui_1.default(function () {
             _this.handleEvent({ event: "BEFORE_CLOSE", payload: {} });
+        }, function () {
+            _this.handleEvent({ event: "OPEN", payload: {} });
         }, options);
         if (typeof window !== "undefined") {
             this.on("LOGIN", function (payload) {
-                return _this.session.onLogin(payload.payload.bearerToken);
+                console.log("Session lOgin Start", _this.session, _this.session.onLogin);
+                _this.session.onLogin(payload.payload.bearerToken);
             });
             this.on("LOGOUT", function () { return _this.session.onLogout(); });
             window.addEventListener("message", function (e) {
                 try {
+                    if (e.origin !== _this.ui.baseUrl)
+                        return;
+                    console.log("Message", e);
                     var data = JSON.parse(e.data);
                     _this.handleEvent(data);
                 }
