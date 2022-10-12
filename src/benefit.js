@@ -53,7 +53,7 @@ var Benefit = /** @class */ (function () {
         };
         this.claim = function () { };
         this.open = function () {
-            _this.ui.openWallet("/benefit-details/".concat(_this.id));
+            _this.ui.openWallet("/benefit-details/".concat(_this.id, "?client_id=").concat(_this.session.clientId));
         };
         this.session = session;
         this.ui = ui;

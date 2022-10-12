@@ -1,4 +1,4 @@
-declare const WalletEventList: readonly ["LOGIN_SUCCESS", "LOGOUT_SUCESS", "OPEN", "BEFORE_CLOSE"];
+declare const WalletEventList: readonly ["LOGIN_SUCCESS", "LOGOUT_SUCESS", "OPEN", "BEFORE_CLOSE", "CANCEL_LOGOUT"];
 export declare type WalletEvent = typeof WalletEventList[number];
 interface IBaseEvent {
     event: WalletEvent;
@@ -19,9 +19,13 @@ export interface IOpenEvent extends IBaseEvent {
 export interface IBeforeCloseEvent extends IBaseEvent {
     event: "BEFORE_CLOSE";
 }
+export interface ICancelLogout extends IBaseEvent {
+    event: "CANCEL_LOGOUT";
+}
 export declare type WalletEventPayloadMap = {
     LOGIN_SUCCESS: ILoginEvent;
     LOGOUT_SUCESS: ILogoutEvent;
+    CANCEL_LOGOUT: ICancelLogout;
     OPEN: IOpenEvent;
     BEFORE_CLOSE: IBeforeCloseEvent;
 };

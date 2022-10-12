@@ -5,7 +5,7 @@ var NFT = /** @class */ (function () {
         var _this = this;
         this.getDetails = function () { };
         this.open = function (options) {
-            _this.ui.openWallet("/nft-details/".concat(_this.id));
+            _this.ui.openWallet("/nft-details/".concat(_this.id, "?client_id=").concat(_this.session.clientId));
         };
         this.session = session;
         this.ui = ui;

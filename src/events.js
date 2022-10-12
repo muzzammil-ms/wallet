@@ -5,4 +5,5 @@ var WalletEventList = [
     "LOGOUT_SUCESS",
     "OPEN",
     "BEFORE_CLOSE",
+    "CANCEL_LOGOUT",
 ];

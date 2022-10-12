@@ -56,7 +56,6 @@ var ui_1 = __importDefault(require("./ui"));
 var Wallet = /** @class */ (function () {
     function Wallet(options) {
         var _this = this;
-        this.client_id = "default";
         this.eventHandlersMap = {};
         this.handleEvent = function (e) {
             var registeredhandlers = _this.eventHandlersMap[e.event] || [];
@@ -78,21 +77,20 @@ var Wallet = /** @class */ (function () {
          * already loggedin in wallet. Autoclose after successfull login
          */
         this.login = function (options) { return __awaiter(_this, void 0, void 0, function () {
-            var isLoginRequired, onLoginSuccess, onFrameClose;
+            var isLoginRequired, onEvent;
             var _this = this;
             return __generator(this, function (_a) {
                 isLoginRequired = (options === null || options === void 0 ? void 0 : options.forced) || !this.session.isLoggedIn;
                 if (!isLoginRequired)
                     return [2 /*return*/];
-                this.openWallet("/login");
-                onLoginSuccess = function (data) {
+                onEvent = function () {
+                    _this.off("LOGIN_SUCCESS", onEvent);
+                    _this.off("BEFORE_CLOSE", onEvent);
                     _this.close();
                 };
-                onFrameClose = function () {
-                    _this.off("LOGIN_SUCCESS", onLoginSuccess);
-                };
-                this.on("LOGIN_SUCCESS", onLoginSuccess, { once: true });
-                this.on("BEFORE_CLOSE", onFrameClose, { once: true });
+                this.on("LOGIN_SUCCESS", onEvent, { once: true });
+                this.on("BEFORE_CLOSE", onEvent, { once: true });
+                this.openWallet("/login?client_id=".concat(this.session.clientId));
                 return [2 /*return*/];
             });
         }); };
@@ -102,12 +100,24 @@ var Wallet = /** @class */ (function () {
          * cache only. This will not logout user from wallet
          */
         this.logout = function (options) { return __awaiter(_this, void 0, void 0, function () {
+            var onEvent;
+            var _this = this;
             return __generator(this, function (_a) {
                 if (options === null || options === void 0 ? void 0 : options.clearUserSessionOnly) {
                     this.session.onLogout();
                     return [2 /*return*/];
                 }
-                this.openWallet("/profile?showLogoutSheet=true");
+                onEvent = function () {
+                    console.log("Received");
+                    _this.off("CANCEL_LOGOUT", onEvent);
+                    _this.off("LOGOUT_SUCESS", onEvent);
+                    _this.off("BEFORE_CLOSE", onEvent);
+                    _this.close();
+                };
+                this.on("CANCEL_LOGOUT", onEvent, { once: true });
+                this.on("LOGOUT_SUCESS", onEvent, { once: true });
+                this.on("BEFORE_CLOSE", onEvent, { once: true });
+                this.openWallet("/profile?client_id=".concat(this.session.clientId, "&showLogoutSheet=true"));
                 return [2 /*return*/];
             });
         }); };
@@ -124,7 +134,7 @@ var Wallet = /** @class */ (function () {
             return new collection_1.default(id, _this.session, _this.ui);
         };
         this.openMyNfts = function () {
-            _this.openWallet("/nfts-list/own");
+            _this.openWallet("/nfts-list/own?client_id=".concat(_this.session.clientId));
         };
         /**
          *
@@ -132,7 +142,7 @@ var Wallet = /** @class */ (function () {
          * specific user case
          */
         this.whitelist = function (whitelistId) {
-            _this.openWallet("/login?whitelist=true");
+            _this.openWallet("/login?client_id=".concat(_this.session.clientId, "&whitelist=true"));
         };
         this.on = function (eventName, handler, options) {
             var handlers = _this.eventHandlersMap[eventName] || [];
@@ -142,8 +152,7 @@ var Wallet = /** @class */ (function () {
             var handlers = _this.eventHandlersMap[eventName] || [];
             _this.eventHandlersMap[eventName] = handlers.filter(function (_handler) { return _handler.handler !== handler; });
         };
-        this.client_id = (options === null || options === void 0 ? void 0 : options.client_id) || "default";
-        this.session = new session_1.default();
+        this.session = new session_1.default(options === null || options === void 0 ? void 0 : options.client_id);
         this.ui = new ui_1.default(function () {
             _this.handleEvent({ event: "BEFORE_CLOSE", payload: {} });
         }, function () {

@@ -3,6 +3,7 @@ const WalletEventList = [
   "LOGOUT_SUCESS",
   "OPEN",
   "BEFORE_CLOSE",
+  "CANCEL_LOGOUT",
 ] as const;
 
 export type WalletEvent = typeof WalletEventList[number];
@@ -31,9 +32,14 @@ export interface IBeforeCloseEvent extends IBaseEvent {
   event: "BEFORE_CLOSE";
 }
 
+export interface ICancelLogout extends IBaseEvent{
+  event: "CANCEL_LOGOUT"
+}
+
 export type WalletEventPayloadMap = {
   LOGIN_SUCCESS: ILoginEvent;
   LOGOUT_SUCESS: ILogoutEvent;
+  CANCEL_LOGOUT: ICancelLogout;
   OPEN: IOpenEvent;
   BEFORE_CLOSE: IBeforeCloseEvent;
 };

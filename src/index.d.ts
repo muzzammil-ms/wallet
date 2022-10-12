@@ -11,7 +11,6 @@ declare type EventOptions = {
     once?: boolean;
 };
 declare class Wallet {
-    private client_id;
     private session;
     private eventHandlersMap;
     private ui;
@@ -34,7 +33,7 @@ declare class Wallet {
      * cache only. This will not logout user from wallet
      */
     logout: (options?: {
-        clearUserSessionOnly: boolean;
+        clearUserSessionOnly?: boolean;
     }) => Promise<void>;
     benefit: (id: string) => Benefit;
     nft: (id: string) => NFT;
@@ -47,7 +46,7 @@ declare class Wallet {
      * specific user case
      */
     whitelist: (whitelistId: string) => void;
-    on: <T extends "LOGIN_SUCCESS" | "LOGOUT_SUCESS" | "OPEN" | "BEFORE_CLOSE">(eventName: T, handler: (data: WalletEventPayloadMap[T]) => void, options?: EventOptions) => void;
-    off: <T extends "LOGIN_SUCCESS" | "LOGOUT_SUCESS" | "OPEN" | "BEFORE_CLOSE">(eventName: T, handler: (data: WalletEventPayloadMap[T]) => void) => void;
+    on: <T extends "LOGIN_SUCCESS" | "LOGOUT_SUCESS" | "OPEN" | "BEFORE_CLOSE" | "CANCEL_LOGOUT">(eventName: T, handler: (data: WalletEventPayloadMap[T]) => void, options?: EventOptions) => void;
+    off: <T extends "LOGIN_SUCCESS" | "LOGOUT_SUCESS" | "OPEN" | "BEFORE_CLOSE" | "CANCEL_LOGOUT">(eventName: T, handler: (data: WalletEventPayloadMap[T]) => void) => void;
 }
 export default Wallet;

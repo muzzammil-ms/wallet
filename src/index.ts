@@ -2,7 +2,12 @@ import Benefit from "./benefit";
 import Session from "./session";
 import NFT from "./nft";
 import Collection from "./collection";
-import { ILoginEvent, WalletEvent, WalletEventPayloadMap } from "./events";
+import {
+  ILoginEvent,
+  ILogoutEvent,
+  WalletEvent,
+  WalletEventPayloadMap,
+} from "./events";
 import WalletUI, { WalletPermission, WalletPermissionConfig } from "./ui";
 
 type WalletOptions = Partial<{
@@ -15,7 +20,6 @@ type EventOptions = {
 };
 
 class Wallet {
-  private client_id = "default";
   private session: Session;
   private eventHandlersMap: {
     [key in WalletEvent]?: { options?: EventOptions; handler: Function }[];
@@ -33,8 +37,7 @@ class Wallet {
   };
 
   constructor(options?: WalletOptions) {
-    this.client_id = options?.client_id || "default";
-    this.session = new Session();
+    this.session = new Session(options?.client_id);
     this.ui = new WalletUI(
       () => {
         this.handleEvent({ event: "BEFORE_CLOSE", payload: {} });
@@ -77,15 +80,14 @@ class Wallet {
   login = async (options?: { forced: boolean }) => {
     const isLoginRequired = options?.forced || !this.session.isLoggedIn;
     if (!isLoginRequired) return;
-    this.openWallet("/login");
-    const onLoginSuccess = (data: ILoginEvent) => {
+    const onEvent = () => {
+      this.off("LOGIN_SUCCESS", onEvent);
+      this.off("BEFORE_CLOSE", onEvent);
       this.close();
     };
-    const onFrameClose = () => {
-      this.off("LOGIN_SUCCESS", onLoginSuccess);
-    };
-    this.on("LOGIN_SUCCESS", onLoginSuccess, { once: true });
-    this.on("BEFORE_CLOSE", onFrameClose, { once: true });
+    this.on("LOGIN_SUCCESS", onEvent, { once: true });
+    this.on("BEFORE_CLOSE", onEvent, { once: true });
+    this.openWallet(`/login?client_id=${this.session.clientId}`);
   };
 
   /**
@@ -93,12 +95,22 @@ class Wallet {
    * @param options.clearUserSessionOnly Deletes token from current browser
    * cache only. This will not logout user from wallet
    */
-  logout = async (options?: { clearUserSessionOnly: boolean }) => {
+  logout = async (options?: { clearUserSessionOnly?: boolean }) => {
     if (options?.clearUserSessionOnly) {
       this.session.onLogout();
       return;
     }
-    this.openWallet("/profile?showLogoutSheet=true");
+    const onEvent = () => {
+      console.log("Received");
+      this.off("CANCEL_LOGOUT", onEvent);
+      this.off("LOGOUT_SUCESS", onEvent);
+      this.off("BEFORE_CLOSE", onEvent);
+      this.close();
+    };
+    this.on("CANCEL_LOGOUT", onEvent, { once: true });
+    this.on("LOGOUT_SUCESS", onEvent, { once: true });
+    this.on("BEFORE_CLOSE", onEvent, { once: true });
+    this.openWallet(`/profile?client_id=${this.session.clientId}&showLogoutSheet=true`);
   };
 
   benefit = (id: string): Benefit => {
@@ -118,7 +130,7 @@ class Wallet {
   };
 
   openMyNfts = () => {
-    this.openWallet("/nfts-list/own");
+    this.openWallet(`/nfts-list/own?client_id=${this.session.clientId}`);
   };
 
   /**
@@ -127,7 +139,7 @@ class Wallet {
    * specific user case
    */
   whitelist = (whitelistId: string) => {
-    this.openWallet(`/login?whitelist=true`);
+    this.openWallet(`/login?client_id=${this.session.clientId}&whitelist=true`);
   };
 
   on = <T extends WalletEvent>(
