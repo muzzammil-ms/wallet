@@ -8,7 +8,7 @@ export type WalletPermissionConfig = Partial<{
 export type WalletPermission = keyof WalletPermissionConfig;
 
 class WalletUI {
-  public readonly baseUrl = "http://localhost:3000";
+  public readonly baseUrl = "https://wallet.metasky.me";
   private portalId = ``;
   private iframeId = ``;
   private walletPermissions: WalletPermissionConfig;

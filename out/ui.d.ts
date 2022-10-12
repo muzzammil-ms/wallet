@@ -6,7 +6,7 @@ export declare type WalletPermissionConfig = Partial<{
 }>;
 export declare type WalletPermission = keyof WalletPermissionConfig;
 declare class WalletUI {
-    readonly baseUrl = "http://localhost:3000";
+    readonly baseUrl = "https://wallet.metasky.me";
     private portalId;
     private iframeId;
     private walletPermissions;
