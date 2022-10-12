@@ -6,8 +6,12 @@ interface IBaseEvent {
 export interface ILoginEvent extends IBaseEvent {
     event: "LOGIN_SUCCESS";
     payload: {
-        user: {};
+        user?: {};
         bearerToken: string;
+        walletAddress?: {
+            nearAddress?: string;
+            ethAddress?: string;
+        };
     };
 }
 export interface ILogoutEvent extends IBaseEvent {

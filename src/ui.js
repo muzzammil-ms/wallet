@@ -14,7 +14,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var WalletUI = /** @class */ (function () {
     function WalletUI(onClose, onOpen, options) {
         var _this = this;
-        this.baseUrl = "http://localhost:3005";
+        this.baseUrl = "http://localhost:3000";
         this.portalId = "";
         this.iframeId = "";
         this.injectPortal = function () {

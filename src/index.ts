@@ -37,7 +37,7 @@ class Wallet {
   };
 
   constructor(options?: WalletOptions) {
-    this.session = new Session(options?.client_id);
+    this.session = new Session();
     this.ui = new WalletUI(
       () => {
         this.handleEvent({ event: "BEFORE_CLOSE", payload: {} });
@@ -48,13 +48,18 @@ class Wallet {
       options
     );
     if (typeof window !== "undefined") {
+      this.session.clientId = options?.client_id || "";
       this.on("LOGIN_SUCCESS", (payload) => {
-        this.session.onLogin(payload.payload.bearerToken);
+        this.session.onLogin(
+          payload.payload.bearerToken,
+          payload.payload.walletAddress
+        );
       });
       this.on("LOGOUT_SUCESS", () => this.session.onLogout());
       window.addEventListener("message", (e) => {
         try {
           if (e.origin !== this.ui.baseUrl) return;
+          console.log("Received", e.data);
           const data = JSON.parse(e.data);
           if (!data.event) return;
           this.handleEvent(data);
@@ -77,7 +82,7 @@ class Wallet {
    * @param options.forced Open wallet and force login user, even if user is
    * already loggedin in wallet. Autoclose after successfull login
    */
-  login = async (options?: { forced: boolean }) => {
+  login = (options?: { forced: boolean }) => {
     const isLoginRequired = options?.forced || !this.session.isLoggedIn;
     if (!isLoginRequired) return;
     const onEvent = () => {
@@ -95,13 +100,12 @@ class Wallet {
    * @param options.clearUserSessionOnly Deletes token from current browser
    * cache only. This will not logout user from wallet
    */
-  logout = async (options?: { clearUserSessionOnly?: boolean }) => {
+  logout = (options?: { clearUserSessionOnly?: boolean }) => {
     if (options?.clearUserSessionOnly) {
       this.session.onLogout();
       return;
     }
     const onEvent = () => {
-      console.log("Received");
       this.off("CANCEL_LOGOUT", onEvent);
       this.off("LOGOUT_SUCESS", onEvent);
       this.off("BEFORE_CLOSE", onEvent);
@@ -110,7 +114,9 @@ class Wallet {
     this.on("CANCEL_LOGOUT", onEvent, { once: true });
     this.on("LOGOUT_SUCESS", onEvent, { once: true });
     this.on("BEFORE_CLOSE", onEvent, { once: true });
-    this.openWallet(`/profile?client_id=${this.session.clientId}&showLogoutSheet=true`);
+    this.openWallet(
+      `/profile?client_id=${this.session.clientId}&showLogoutSheet=true`
+    );
   };
 
   benefit = (id: string): Benefit => {
@@ -140,6 +146,14 @@ class Wallet {
    */
   whitelist = (whitelistId: string) => {
     this.openWallet(`/login?client_id=${this.session.clientId}&whitelist=true`);
+  };
+
+  getSession = () => {
+    return this.session;
+  };
+
+  setClientId = (clientId: string) => {
+    this.session.clientId = clientId;
   };
 
   on = <T extends WalletEvent>(

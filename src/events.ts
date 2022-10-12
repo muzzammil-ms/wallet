@@ -15,8 +15,12 @@ interface IBaseEvent {
 export interface ILoginEvent extends IBaseEvent {
   event: "LOGIN_SUCCESS";
   payload: {
-    user: {};
+    user?: {};
     bearerToken: string;
+    walletAddress?: {
+      nearAddress?: string;
+      ethAddress?: string;
+    };
   };
 }
 
@@ -32,8 +36,8 @@ export interface IBeforeCloseEvent extends IBaseEvent {
   event: "BEFORE_CLOSE";
 }
 
-export interface ICancelLogout extends IBaseEvent{
-  event: "CANCEL_LOGOUT"
+export interface ICancelLogout extends IBaseEvent {
+  event: "CANCEL_LOGOUT";
 }
 
 export type WalletEventPayloadMap = {

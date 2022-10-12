@@ -1,4 +1,5 @@
 import Benefit from "./benefit";
+import Session from "./session";
 import NFT from "./nft";
 import Collection from "./collection";
 import { WalletEventPayloadMap } from "./events";
@@ -26,7 +27,7 @@ declare class Wallet {
      */
     login: (options?: {
         forced: boolean;
-    }) => Promise<void>;
+    }) => void;
     /**
      * Opens wallet in logout page
      * @param options.clearUserSessionOnly Deletes token from current browser
@@ -34,7 +35,7 @@ declare class Wallet {
      */
     logout: (options?: {
         clearUserSessionOnly?: boolean;
-    }) => Promise<void>;
+    }) => void;
     benefit: (id: string) => Benefit;
     nft: (id: string) => NFT;
     listCollections: (filters: any) => Collection[];
@@ -46,6 +47,8 @@ declare class Wallet {
      * specific user case
      */
     whitelist: (whitelistId: string) => void;
+    getSession: () => Session;
+    setClientId: (clientId: string) => void;
     on: <T extends "LOGIN_SUCCESS" | "LOGOUT_SUCESS" | "OPEN" | "BEFORE_CLOSE" | "CANCEL_LOGOUT">(eventName: T, handler: (data: WalletEventPayloadMap[T]) => void, options?: EventOptions) => void;
     off: <T extends "LOGIN_SUCCESS" | "LOGOUT_SUCESS" | "OPEN" | "BEFORE_CLOSE" | "CANCEL_LOGOUT">(eventName: T, handler: (data: WalletEventPayloadMap[T]) => void) => void;
 }
