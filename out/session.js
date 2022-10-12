@@ -13,8 +13,10 @@ var Session = /** @class */ (function () {
             (_b = Session.getStorage()) === null || _b === void 0 ? void 0 : _b.setItem(Session.addressKey, JSON.stringify(address));
         };
         this.onLogout = function () {
-            var _a;
+            var _a, _b, _c;
             (_a = Session.getStorage()) === null || _a === void 0 ? void 0 : _a.removeItem(Session.bearerTokenKey);
+            (_b = Session.getStorage()) === null || _b === void 0 ? void 0 : _b.removeItem(Session.addressKey);
+            (_c = Session.getStorage()) === null || _c === void 0 ? void 0 : _c.removeItem(Session.clientIdKey);
         };
     }
     Object.defineProperty(Session.prototype, "isLoggedIn", {

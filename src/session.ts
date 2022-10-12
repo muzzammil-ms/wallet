@@ -22,6 +22,8 @@ class Session {
 
   onLogout = () => {
     Session.getStorage()?.removeItem(Session.bearerTokenKey);
+    Session.getStorage()?.removeItem(Session.addressKey);
+    Session.getStorage()?.removeItem(Session.clientIdKey);
   };
 
   get isLoggedIn() {
