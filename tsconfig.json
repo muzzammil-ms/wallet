@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "outDir": "./src",
+    "outDir": "./out",
     "target": "es5",
     "allowJs": true,
     "skipLibCheck": true,
