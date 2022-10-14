@@ -14,7 +14,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var WalletUI = /** @class */ (function () {
     function WalletUI(onClose, onOpen, options) {
         var _this = this;
-        this.baseUrl = "https://wallet.metasky.me";
+        this.baseUrl = "https://app-1box.metasky.me";
         this.portalId = "";
         this.iframeId = "";
         this.injectPortal = function () {
