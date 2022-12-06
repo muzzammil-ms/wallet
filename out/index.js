@@ -14,7 +14,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var benefit_1 = __importDefault(require("./benefit"));
 var session_1 = __importDefault(require("./session"));
-var nft_1 = __importDefault(require("./nft"));
 var collection_1 = __importDefault(require("./collection"));
 var ui_1 = __importDefault(require("./ui"));
 var Wallet = /** @class */ (function () {
@@ -28,12 +27,6 @@ var Wallet = /** @class */ (function () {
             });
             _this.eventHandlersMap[e.event] = registeredhandlers.filter(function (handler) { var _a; return !((_a = handler.options) === null || _a === void 0 ? void 0 : _a.once); });
         };
-        this.openWallet = function (path) {
-            _this.ui.openWallet(path);
-        };
-        this.close = function () {
-            _this.ui.close();
-        };
         /**
          * Opens wallet with autoclose on successsfull login operation.
          * No op if already loggedin.
@@ -41,7 +34,8 @@ var Wallet = /** @class */ (function () {
          * already loggedin in wallet. Autoclose after successfull login
          */
         this.login = function (options) {
-            var isLoginRequired = (options === null || options === void 0 ? void 0 : options.forced) || !_this.session.isLoggedIn;
+            var _a;
+            var isLoginRequired = ((_a = options === null || options === void 0 ? void 0 : options.payload) === null || _a === void 0 ? void 0 : _a.forced) || !_this.session.isLoggedIn;
             if (!isLoginRequired)
                 return;
             var onEvent = function () {
@@ -51,7 +45,7 @@ var Wallet = /** @class */ (function () {
             };
             _this.on("LOGIN_SUCCESS", onEvent, { once: true });
             _this.on("BEFORE_CLOSE", onEvent, { once: true });
-            _this.openWallet("/login?client_id=".concat(_this.session.clientId));
+            _this.open("/login?client_id=".concat(_this.session.clubId));
         };
         /**
          * Opens wallet in logout page
@@ -59,7 +53,8 @@ var Wallet = /** @class */ (function () {
          * cache only. This will not logout user from wallet
          */
         this.logout = function (options) {
-            if (options === null || options === void 0 ? void 0 : options.clearUserSessionOnly) {
+            var _a;
+            if ((_a = options === null || options === void 0 ? void 0 : options.payload) === null || _a === void 0 ? void 0 : _a.clearUserSessionOnly) {
                 _this.session.onLogout();
                 return;
             }
@@ -72,36 +67,41 @@ var Wallet = /** @class */ (function () {
             _this.on("CANCEL_LOGOUT", onEvent, { once: true });
             _this.on("LOGOUT_SUCESS", onEvent, { once: true });
             _this.on("BEFORE_CLOSE", onEvent, { once: true });
-            _this.openWallet("/profile?client_id=".concat(_this.session.clientId, "&showLogoutSheet=true"));
+            _this.open("/profile?client_id=".concat(_this.session.clubId, "&showLogoutSheet=true"));
         };
-        this.benefit = function (id) {
-            return new benefit_1.default(id, _this.session, _this.ui);
+        this.open = function (path) {
+            _this.ui.openWallet(path);
         };
-        this.nft = function (id) {
-            return new nft_1.default(id, _this.session, _this.ui);
+        this.do = function (option) {
+            if (!option || typeof option === "string") {
+                _this.ui.openWallet(option);
+                return;
+            }
+            switch (option === null || option === void 0 ? void 0 : option.action) {
+                case "LOGIN":
+                    _this.login(option);
+                    break;
+                case "LOGOUT":
+                    _this.logout(option);
+                    break;
+                case "OPEN_BENEFIT":
+                    new benefit_1.default(option.payload.benefitId, _this.session, _this.ui).open();
+                    break;
+                case "OPEN_COLLECTION":
+                    new collection_1.default(option.payload.collectionId, _this.session, _this.ui).open(undefined, { uiState: "NFT_LIST" });
+                    break;
+                case "OPEN_COLLECTION_DETAILS":
+                    new collection_1.default(option.payload.collectionId, _this.session, _this.ui).open(undefined, { uiState: "DETAIL" });
+                    break;
+                case "OPEN_MY_NFTS":
+                    _this.ui.openWallet("/nfts-list/own?client_id=".concat(_this.session.clubId));
+                    break;
+                default:
+                    _this.ui.openWallet();
+            }
         };
-        this.listCollections = function (filters) {
-            return [];
-        };
-        this.collection = function (id) {
-            return new collection_1.default(id, _this.session, _this.ui);
-        };
-        this.openMyNfts = function () {
-            _this.openWallet("/nfts-list/own?client_id=".concat(_this.session.clientId));
-        };
-        /**
-         *
-         * @param whitelistId WhitelistId be uniquely shared with every client for
-         * specific user case
-         */
-        this.whitelist = function (whitelistId) {
-            _this.openWallet("/login?client_id=".concat(_this.session.clientId, "&whitelist=true"));
-        };
-        this.getSession = function () {
-            return _this.session;
-        };
-        this.setClientId = function (clientId) {
-            _this.session.clientId = clientId;
+        this.close = function () {
+            _this.ui.close();
         };
         this.on = function (eventName, handler, options) {
             var handlers = _this.eventHandlersMap[eventName] || [];
@@ -116,9 +116,9 @@ var Wallet = /** @class */ (function () {
             _this.handleEvent({ event: "BEFORE_CLOSE", payload: {} });
         }, function () {
             _this.handleEvent({ event: "OPEN", payload: {} });
-        }, options);
+        });
         if (typeof window !== "undefined") {
-            this.session.clientId = (options === null || options === void 0 ? void 0 : options.client_id) || "";
+            this.session.clubId = (options === null || options === void 0 ? void 0 : options.clubId) || "";
             this.on("LOGIN_SUCCESS", function (payload) {
                 _this.session.onLogin(payload.payload.bearerToken, payload.payload.walletAddress);
             });
@@ -139,9 +139,13 @@ var Wallet = /** @class */ (function () {
     }
     return Wallet;
 }());
+function Metasky(options) {
+    return new Wallet(options);
+}
+exports.default = Metasky;
 if (typeof window !== "undefined") {
     var initWallet = function () {
-        window.Wallet = Wallet;
+        window.Metasky = Metasky;
     };
     if (document.readyState === "complete") {
         initWallet();
@@ -153,4 +157,3 @@ if (typeof window !== "undefined") {
         window.addEventListener("load", initWallet, false);
     }
 }
-exports.default = Wallet;

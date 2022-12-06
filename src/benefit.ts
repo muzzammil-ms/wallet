@@ -26,7 +26,9 @@ class Benefit {
   claim = () => {};
 
   open = () => {
-    this.ui.openWallet(`/benefit-details/${this.id}?client_id=${this.session.clientId}`);
+    this.ui.openWallet(
+      `/benefit-details/${this.id}?client_id=${this.session.clubId}`
+    );
   };
 }
 

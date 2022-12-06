@@ -16,7 +16,7 @@ var Session = /** @class */ (function () {
             var _a, _b, _c;
             (_a = Session.getStorage()) === null || _a === void 0 ? void 0 : _a.removeItem(Session.bearerTokenKey);
             (_b = Session.getStorage()) === null || _b === void 0 ? void 0 : _b.removeItem(Session.addressKey);
-            (_c = Session.getStorage()) === null || _c === void 0 ? void 0 : _c.removeItem(Session.clientIdKey);
+            (_c = Session.getStorage()) === null || _c === void 0 ? void 0 : _c.removeItem(Session.clubIdKey);
         };
     }
     Object.defineProperty(Session.prototype, "isLoggedIn", {
@@ -33,14 +33,14 @@ var Session = /** @class */ (function () {
         enumerable: false,
         configurable: true
     });
-    Object.defineProperty(Session.prototype, "clientId", {
+    Object.defineProperty(Session.prototype, "clubId", {
         get: function () {
             var _a;
-            return ((_a = Session.getStorage()) === null || _a === void 0 ? void 0 : _a.getItem(Session.clientIdKey)) || "default";
+            return ((_a = Session.getStorage()) === null || _a === void 0 ? void 0 : _a.getItem(Session.clubIdKey)) || "default";
         },
-        set: function (client_id) {
+        set: function (club_id) {
             var _a;
-            (_a = Session.getStorage()) === null || _a === void 0 ? void 0 : _a.setItem(Session.clientIdKey, client_id);
+            (_a = Session.getStorage()) === null || _a === void 0 ? void 0 : _a.setItem(Session.clubIdKey, club_id);
         },
         enumerable: false,
         configurable: true
@@ -63,7 +63,7 @@ var Session = /** @class */ (function () {
         configurable: true
     });
     Session.bearerTokenKey = "ms-bearer-token";
-    Session.clientIdKey = "ms-client-id";
+    Session.clubIdKey = "ms-club-id";
     Session.addressKey = "ms-chain-address";
     Session.getStorage = function () {
         if (typeof window !== "undefined")

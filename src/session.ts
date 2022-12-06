@@ -7,7 +7,7 @@ type ChainAddress = {
 
 class Session {
   static readonly bearerTokenKey = "ms-bearer-token";
-  static readonly clientIdKey = "ms-client-id";
+  static readonly clubIdKey = "ms-club-id";
   static readonly addressKey = "ms-chain-address";
 
   static getStorage = () => {
@@ -23,7 +23,7 @@ class Session {
   onLogout = () => {
     Session.getStorage()?.removeItem(Session.bearerTokenKey);
     Session.getStorage()?.removeItem(Session.addressKey);
-    Session.getStorage()?.removeItem(Session.clientIdKey);
+    Session.getStorage()?.removeItem(Session.clubIdKey);
   };
 
   get isLoggedIn() {
@@ -35,8 +35,8 @@ class Session {
     return expTime > currentTime;
   }
 
-  get clientId() {
-    return Session.getStorage()?.getItem(Session.clientIdKey) || "default";
+  get clubId() {
+    return Session.getStorage()?.getItem(Session.clubIdKey) || "default";
   }
 
   get bearerToken() {
@@ -48,8 +48,8 @@ class Session {
     return value ? JSON.parse(value) : {};
   }
 
-  set clientId(client_id: string) {
-    Session.getStorage()?.setItem(Session.clientIdKey, client_id);
+  set clubId(club_id: string) {
+    Session.getStorage()?.setItem(Session.clubIdKey, club_id);
   }
 }
 

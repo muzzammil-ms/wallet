@@ -13,9 +13,9 @@ var Collection = /** @class */ (function () {
             return [];
         };
         this.open = function (filters, options) {
-            var path = "/collection-details?filters={\"collectionIds\":[\"".concat(_this.id, "\"]}&client_id=").concat(_this.session.clientId);
+            var path = "/collection-details?filters={\"collectionIds\":[\"".concat(_this.id, "\"]}&client_id=").concat(_this.session.clubId);
             if ((options === null || options === void 0 ? void 0 : options.uiState) === "NFT_LIST") {
-                path = "/marketplace/listings?filters={\"collectionIds\":[\"".concat(_this.id, "\"]}&client_id=").concat(_this.session.clientId);
+                path = "/marketplace/listings?filters={\"collectionIds\":[\"".concat(_this.id, "\"]}&client_id=").concat(_this.session.clubId);
             }
             _this.ui.openWallet(path);
         };

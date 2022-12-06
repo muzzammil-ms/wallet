@@ -4,15 +4,15 @@ declare type ChainAddress = {
 };
 declare class Session {
     static readonly bearerTokenKey = "ms-bearer-token";
-    static readonly clientIdKey = "ms-client-id";
+    static readonly clubIdKey = "ms-club-id";
     static readonly addressKey = "ms-chain-address";
     static getStorage: () => Storage | undefined;
     onLogin: (bearerToken: string, address?: ChainAddress) => void;
     onLogout: () => void;
     get isLoggedIn(): boolean;
-    get clientId(): string;
+    get clubId(): string;
     get bearerToken(): string | null | undefined;
     get chainAddress(): ChainAddress;
-    set clientId(client_id: string);
+    set clubId(club_id: string);
 }
 export default Session;

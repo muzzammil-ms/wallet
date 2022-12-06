@@ -1,14 +1,14 @@
-export type WalletPermissionConfig = Partial<{
+type WalletPermissionConfig = Partial<{
   "clipboard-read": boolean;
   "clipboard-write": boolean;
   camera: boolean;
   microphone: boolean;
 }>;
 
-export type WalletPermission = keyof WalletPermissionConfig;
+type WalletPermission = keyof WalletPermissionConfig;
 
 class WalletUI {
-  public readonly baseUrl = "https://app-1box.metasky.me";
+  public readonly baseUrl = "https://wallet.metasky.me";
   private portalId = ``;
   private iframeId = ``;
   private walletPermissions: WalletPermissionConfig;
@@ -169,21 +169,14 @@ class WalletUI {
     document.body.appendChild(portal);
   };
 
-  constructor(
-    onClose: () => void,
-    onOpen: () => void,
-    options?: { permission?: WalletPermissionConfig }
-  ) {
+  constructor(onClose: () => void, onOpen: () => void) {
     this.onClose = onClose;
     this.onOpen = onOpen;
     this.walletPermissions = {
-      ...{
-        camera: true,
-        "clipboard-read": true,
-        "clipboard-write": true,
-        microphone: true,
-      },
-      ...(options?.permission || {}),
+      camera: true,
+      "clipboard-read": true,
+      "clipboard-write": true,
+      microphone: true,
     };
     this.portalId = WalletUI.generatePortalId();
     this.iframeId = `${this.portalId}-iframe`;
@@ -206,7 +199,6 @@ class WalletUI {
   };
 
   close = () => {
-    document.getElementById(this.iframeId)?.setAttribute("src", ``);
     document.getElementById(this.portalId)?.setAttribute("style", ``);
     this.onClose();
   };

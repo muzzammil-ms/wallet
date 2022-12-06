@@ -1,20 +1,9 @@
 "use strict";
-var __assign = (this && this.__assign) || function () {
-    __assign = Object.assign || function(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-                t[p] = s[p];
-        }
-        return t;
-    };
-    return __assign.apply(this, arguments);
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 var WalletUI = /** @class */ (function () {
-    function WalletUI(onClose, onOpen, options) {
+    function WalletUI(onClose, onOpen) {
         var _this = this;
-        this.baseUrl = "https://app-1box.metasky.me";
+        this.baseUrl = "https://wallet.metasky.me";
         this.portalId = "";
         this.iframeId = "";
         this.injectPortal = function () {
@@ -81,19 +70,18 @@ var WalletUI = /** @class */ (function () {
             _this.onOpen();
         };
         this.close = function () {
-            var _a, _b;
-            (_a = document.getElementById(_this.iframeId)) === null || _a === void 0 ? void 0 : _a.setAttribute("src", "");
-            (_b = document.getElementById(_this.portalId)) === null || _b === void 0 ? void 0 : _b.setAttribute("style", "");
+            var _a;
+            (_a = document.getElementById(_this.portalId)) === null || _a === void 0 ? void 0 : _a.setAttribute("style", "");
             _this.onClose();
         };
         this.onClose = onClose;
         this.onOpen = onOpen;
-        this.walletPermissions = __assign({
+        this.walletPermissions = {
             camera: true,
             "clipboard-read": true,
             "clipboard-write": true,
             microphone: true,
-        }, ((options === null || options === void 0 ? void 0 : options.permission) || {}));
+        };
         this.portalId = WalletUI.generatePortalId();
         this.iframeId = "".concat(this.portalId, "-iframe");
         if (typeof window !== "undefined") {

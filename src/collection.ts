@@ -26,9 +26,9 @@ class Collection {
   };
 
   open = (filters: any, options?: { uiState: UIPageState }) => {
-    let path = `/collection-details?filters={"collectionIds":["${this.id}"]}&client_id=${this.session.clientId}`;
+    let path = `/collection-details?filters={"collectionIds":["${this.id}"]}&client_id=${this.session.clubId}`;
     if (options?.uiState === "NFT_LIST") {
-      path = `/marketplace/listings?filters={"collectionIds":["${this.id}"]}&client_id=${this.session.clientId}`;
+      path = `/marketplace/listings?filters={"collectionIds":["${this.id}"]}&client_id=${this.session.clubId}`;
     }
     this.ui.openWallet(path);
   };
