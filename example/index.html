@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Metasky</title>
+    <script src="../dist/main.js"></script>
+    <script>
+      function openWallet() {
+        var metasky = window.Metasky({ clubId: "YOUR CLUB ID" });
+        metasky.open();
+      }
+    </script>
+    <style>
+      .center {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0px;
+      }
+    </style>
+  </head>
+  <body class="center">
+    <button onclick="openWallet()">Open Wallet</button>
+  </body>
+</html>
